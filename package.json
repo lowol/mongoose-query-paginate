@@ -1,0 +1,13 @@
+{
+  "name": "mongoose-query-paginate",
+  "version": "0.0.1",
+  "main": "index.js",
+  "author": "lowol",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/lowol/mongoose-query-paginate.git"
+  },
+  "keywords": ["mongoose", "paginate", "pager"],
+  "license": "MIT",
+  "description": "Mongoose Query paginate."
+}
