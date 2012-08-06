@@ -9,5 +9,9 @@
   },
   "keywords": ["mongoose", "paginate", "pager"],
   "license": "MIT",
-  "description": "Mongoose Query paginate."
+  "description": "Mongoose Query paginate.",
+  "devDependencies": {
+    "mongoose": "*",
+    "mocha": "*"
+  }
 }
