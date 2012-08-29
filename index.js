@@ -46,8 +46,8 @@ Query.prototype.paginate = function(options, callback) {
         'options': options,
         'current': current,
         'last': last,
-        'prev': current == start ? null : current - 1,
-        'next': current == end ? null : current + 1,
+        'prev': !count || current == start ? null : current - 1,
+        'next': !count || current == end ? null : current + 1,
         'pages': pages,
         'count': count
       };

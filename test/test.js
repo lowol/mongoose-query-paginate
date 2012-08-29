@@ -101,4 +101,14 @@ describe('paginate', function() {
     });
   });
 
+  it('no data', function(done) {
+    var query = Comment.find().where('number').gt(1000);
+    query.paginate({}, function(err, pager) {
+      assert.equal(pager.count, 0);
+      assert.equal(pager.prev, null);
+      assert.equal(pager.next, null);
+      done(err);
+    });
+  });
+
 });
