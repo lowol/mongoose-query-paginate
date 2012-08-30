@@ -90,6 +90,20 @@ describe('paginate', function() {
     });
   });
 
+  it('options.offset', function(done) {
+    Comment.find().paginate({offset: 2}, function(err, pager) {
+      assert.equal(pager.results[0].number, 3);
+      done(err);
+    });
+  });
+
+  it('options.offset & page', function(done) {
+    Comment.find().paginate({offset: 2, page: 2, perPage: 5}, function(err, pager) {
+      assert.equal(pager.results[0].number, 8);
+      done(err);
+    });
+  });
+
   it('custom query', function(done) {
     var query = Comment.find().where('number').lte(50).sort('number', -1);
     query.paginate({}, function(err, pager) {
