@@ -1,6 +1,6 @@
 {
   "name": "mongoose-query-paginate",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "main": "index.js",
   "author": "lowol",
   "repository": {

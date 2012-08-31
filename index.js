@@ -36,7 +36,9 @@ Query.prototype.paginate = function(options, callback) {
       results = results || [];
       var page = ~~options.page || 0;
       var delta = options.delta;
-      var last = Math.ceil(count / (options.perPage + options.offset));
+      var offset_count = count - options.offset;
+      offset_count = offset_count > 0 ? offset_count : 0;
+      var last = Math.ceil(offset_count / options.perPage);
       var current = page;
       var start = page - delta > 1 ? page - delta : 1;
       var end = current + delta + 1 < last ? current + delta : last;
@@ -46,13 +48,19 @@ Query.prototype.paginate = function(options, callback) {
         pages.push(i);
       }
 
+      var prev = !count || current == start ? null : current - 1;
+      var next = !count || current == end ? null : current + 1;
+      if (!offset_count) {
+        prev = next = last = null;
+      }
+
       var pager = {
         'results': results,
         'options': options,
         'current': current,
         'last': last,
-        'prev': !count || current == start ? null : current - 1,
-        'next': !count || current == end ? null : current + 1,
+        'prev': prev,
+        'next': next,
         'pages': pages,
         'count': count
       };
