@@ -34,7 +34,7 @@ Query.prototype.paginate = function(options, callback) {
       }
 
       results = results || [];
-      var page = ~~options.page || 0;
+      var page = parseInt(options.page, 10) || 0;
       var delta = options.delta;
       var offset_count = count - options.offset;
       offset_count = offset_count > 0 ? offset_count : 0;
