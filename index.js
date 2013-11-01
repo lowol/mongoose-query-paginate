@@ -27,7 +27,7 @@ Query.prototype.paginate = function(options, callback) {
   model.count(query._conditions, function(err, count) {
     var _skip = (options.page - 1) * options.perPage;
     _skip += options.offset;
-    query.skip(_skip).limit(options.perPage).execFind(function(err, results) {
+    query.skip(_skip).limit(options.perPage).exec(function(err, results) {
       if (err) {
         callback(err, {});
         return;
