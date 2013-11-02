@@ -1,6 +1,10 @@
 {
+<<<<<<< HEAD
   "name": "mongoose-query-paginate",
 <<<<<<< HEAD
+=======
+  "name": "mongoose-query-paginate-darul",
+>>>>>>> parent of 75f6a83... Update package.json
   "version": "1.0.1",
 =======
   "version": "1.0.0",
