@@ -20,27 +20,26 @@ var Comment = conn.model('Comment', CommentSchema);
 describe('paginate', function() {
 
   before(function(done) {
-    return Comment.remove({}, function(err) {
-      insert(1, 23, done);
+    Comment.remove({}, function(err) {
+      var promises = [];
+      for (var i = 1; i <= 23; i++) {
+        promises.push(insert(i));
+      }
+
+      Promise.all(promises).then(function() {
+        done();
+      }, function(err) {
+        done(err);
+      });
     });
 
-    function insert(i, max, fn) {
-      if (i > max) return fn();
-
-      new Comment({
+    function insert(i) {
+      return new Comment({
         number: i,
         name: 'name' + i,
         body: 'body' + i
-      }).save(function(err) {
-        if (err) {
-          console.log(err);
-          fn(err);
-          return;
-        }
-        insert(++i, max, fn);
-      });
+      }).save();
     }
-
   });
 
   after(function() {
