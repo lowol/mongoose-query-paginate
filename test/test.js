@@ -2,125 +2,112 @@
  * test
  */
 //var should = require('should');
-var assert = require('assert');
+const assert = require("assert");
 
-var mongoose = require('mongoose');
-require('../index');
+const mongoose = require("mongoose");
+require("../index");
 
-var conn = mongoose.createConnection('mongodb://localhost/query-test');
-//conn.db.dropDatabase();
+describe("mongoose-query-paginate", function () {
+  let Comment;
+  let conn;
+  before(async function () {
+    conn = await mongoose.connect("mongodb://localhost:27017/query-test");
 
-var CommentSchema = new mongoose.Schema({
-  number: Number,
-  name: String,
-  body: String
-});
-var Comment = conn.model('Comment', CommentSchema);
-
-describe('paginate', function() {
-
-  before(function(done) {
-    Comment.remove({}, function(err) {
-      var promises = [];
-      for (var i = 1; i <= 100; i++) {
-        insert(i);
-      }
-      Promise.all(promises).then(function(data) {
-        done();
-      }, function(err) {
-        done(err);
-      });
+    const CommentSchema = new mongoose.Schema({
+      number: Number,
+      name: String,
+      body: String,
     });
 
-    function insert(i) {
-      return new Comment({
-        number: i,
-        name: 'name' + i,
-        body: 'body' + i
-      }).save();
-    }
+    Comment = conn.model("Comment", CommentSchema);
+
+    await Comment.deleteMany({});
   });
 
-  after(function() {
-    conn.close();
-  });
+  describe("paginate", function () {
+    before(async function () {
+      await Comment.deleteMany({});
+      var promises = [];
+      for (var i = 1; i <= 100; i++) {
+        promises.push(insert(i));
+      }
+      await Promise.all(promises);
 
-  it('default pager', function(done) {
-    Comment.find().paginate({}, function(err, pager) {
-      assert.equal(err, null);
+      async function insert(i) {
+        return new Comment({
+          number: i,
+          name: "name" + i,
+          body: "body" + i,
+        }).save();
+      }
+    });
+
+    after(async function () {
+      await conn.disconnect();
+    });
+
+    it("default pager", async function () {
+      const pager = await Comment.find().paginate({});
       assert.equal(pager.count, 100);
       assert.equal(pager.current, 1);
       assert.equal(pager.last, 10);
       assert.equal(pager.prev, null);
       assert.equal(pager.next, 2);
-      assert.equal(pager.pages.join(','), '1,2,3,4,5,6');
-      done(err);
+      assert.equal(pager.pages.join(","), "1,2,3,4,5,6");
     });
-  });
 
-  it('options.page', function(done) {
-    Comment.find().paginate({page: 2}, function(err, pager) {
+    it("options.page", async function () {
+      const pager = await Comment.find().paginate({ page: 2 });
       assert.equal(pager.current, 2);
       assert.equal(pager.prev, 1);
       assert.equal(pager.next, 3);
-      done(err);
     });
-  });
 
-  it('options.perPage', function(done) {
-    Comment.find().paginate({perPage: 5}, function(err, pager) {
+    it("options.perPage", async function () {
+      const pager = await Comment.find().paginate({ perPage: 5 });
       assert.equal(pager.results.length, 5);
-      done(err);
     });
-  });
 
-  it('options.delta', function(done) {
-    Comment.find().paginate({delta: 3}, function(err, pager) {
-      assert.equal(pager.pages.join(','), '1,2,3,4');
-      done(err);
+    it("options.delta", async function () {
+      const pager = await Comment.find().paginate({ delta: 3 });
+      assert.equal(pager.pages.join(","), "1,2,3,4");
     });
-  });
 
-  it('options.delta & page', function(done) {
-    Comment.find().paginate({delta: 3, page: 4}, function(err, pager) {
-      assert.equal(pager.pages.join(','), '1,2,3,4,5,6,7');
-      done(err);
+    it("options.delta & page", async function () {
+      const pager = await Comment.find().paginate({ delta: 3, page: 4 });
+      assert.equal(pager.pages.join(","), "1,2,3,4,5,6,7");
     });
-  });
 
-  it('options.offset', function(done) {
-    Comment.find().sort('number').paginate({offset: 2}, function(err, pager) {
+    it("options.offset", async function () {
+      const pager = await Comment.find().sort("number").paginate({ offset: 2 });
       assert.equal(pager.results[0].number, 3);
-      done(err);
     });
-  });
 
-  it('options.offset & page', function(done) {
-    Comment.find().sort('number').paginate({offset: 2, page: 2, perPage: 5}, function(err, pager) {
+    it("options.offset & page", async function () {
+      const pager = await Comment.find()
+        .sort("number")
+        .paginate({ offset: 2, page: 2, perPage: 5 });
       assert.equal(pager.results[0].number, 8);
-      done(err);
     });
-  });
 
-  it('custom query', function(done) {
-    var query = Comment.find().where('number').lte(50).sort('-number');
-    query.paginate({}, function(err, pager) {
-      var numbers = pager.results.map(function(v) {
+    it("custom query", async function () {
+      const query = Comment.find().where("number").lte(50).sort("-number");
+      const pager = await query.paginate({});
+      const numbers = pager.results.map(function (v) {
         return v.number;
       });
-      assert.equal(numbers.join(','), [50,49,48,47,46,45,44,43,42,41].join(','));
-      done(err);
+      assert.equal(
+        numbers.join(","),
+        [50, 49, 48, 47, 46, 45, 44, 43, 42, 41].join(",")
+      );
     });
-  });
 
-  it('no data', function(done) {
-    var query = Comment.find().where('number').gt(1000);
-    query.paginate({}, function(err, pager) {
+    it("no data", async function () {
+      const query = Comment.find().where("number").gt(1000);
+      const pager = await query.paginate({});
       assert.equal(pager.count, 0);
       assert.equal(pager.prev, null);
       assert.equal(pager.next, null);
-      done(err);
     });
   });
-
 });

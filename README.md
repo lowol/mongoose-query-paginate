@@ -28,6 +28,16 @@
       //};
     });
 
+## Migration from v1.x to v2
+
+Instead of using callbacks, the paginate method now returns a promise.
+
+So it becomes:
+
+```js
+const pager = await query.paginate(options);
+```
+
 ## License
 
 The MIT License
